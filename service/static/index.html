@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Product Catalog Administration</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="static/images/newapp-icon.png">
+    <link rel="stylesheet" href="static/css/cerulean_bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+          <h1>Product Catalog Administration</h1>
+      </div>
+
+      <!-- Flash Message -->
+      <div class="table-responsive">
+        <table class="table">
+          <tr><td>Status:</td><td><span id="flash_message"></span></td></tr>
+        </table>
+      </div>
+
+      <!-- FORM -->
+      <div class="col-md-12" id="form_data">
+        <h3>Create, Retrieve, Update, and Delete a Product:</h3>
+        <div class="well">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="product_id">Product ID:</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="product_id" placeholder="Enter ID of Product">
+              </div>
+              <div class="col-sm-4">
+                <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
+                <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
+              </div>
+            </div>
+          </div> <!-- form horizontal -->
+
+          <div class="form-horizontal">
+
+            <!-- NAME -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="product_name">Name:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="product_name" placeholder="Enter name for Product">
+              </div>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="product_description">Description:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="product_description" placeholder="Enter description for Product">
+              </div>
+            </div>
+
+            <!-- AVAILABLE -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="product_available">Available:</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="product_available">
+                  <option value="true" selected>True</option>
+                  <option value="false">False</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- CATEGORY -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="product_category">Category:</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="product_category">
+                  <option value="UNKNOWN" selected>Unknown</option>
+                  <option value="CLOTHS">Cloths</option>
+                  <option value="FOOD">Food</option>
+                  <option value="HOUSEWARES">Housewares</option>
+                  <option value="AUTOMOTIVE">Automotive</option>
+                  <option value="TOOLS">Tools</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- PRICE -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="product_price">Price:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="product_price" placeholder="Enter price for Product">
+              </div>
+            </div>
+
+            
+            <!-- SUBMIT BUTTONS -->
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+                <button type="submit" class="btn btn-success" id="create-btn">Create</button>
+                <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+              </div>
+            </div>
+          </div> <!-- form horizontal -->
+        </div> <!-- end well -->
+      </div> <!-- end Form -->
+
+      <!-- Search Results -->
+      <div class="table-responsive col-md-12" id="search_results">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th class="col-md-1">ID</th>
+            <th class="col-md-4">Name</th>
+            <th class="col-md-4">Description</th>
+            <th class="col-md-3">Available</th>
+            <th class="col-md-3">Category</th>
+            <th class="col-md-3">Birthday</th>
+          </tr>
+          </thead>
+        </table>
+      </div>
+
+      <footer>
+        <br><br>
+        <p>&copy; The Product Company 2023</p>
+      </footer>
+
+    </div> <!-- container -->
+
+  <script type="text/javascript" src = "static/js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src = "static/js/bootstrap.min.js"></script>
+
+  <!-- YOUR REST API -->
+  <script type="text/javascript" src="static/js/rest_api.js"></script>
+
+  </body>
+</html>
