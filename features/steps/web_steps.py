@@ -26,7 +26,6 @@ For information on Waiting until elements are present in the HTML see:
 """
 import logging
 from behave import when, then
-from compare import expect, ensure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
@@ -44,38 +43,37 @@ def step_impl(context):
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
-    expect(context.driver.title).to_contain(message)
+    assert(message in context.driver.title)
 
 @then('I should not see "{text_string}"')
 def step_impl(context, text_string):
     element = context.driver.find_element(By.TAG_NAME, 'body')
-    error_msg = "I should not see '%s' in '%s'" % (text_string, element.text)
-    ensure(text_string in element.text, False, error_msg)
+    assert(text_string not in element.text)
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = context.driver.find_element_by_id(element_id)
+    element = context.driver.find_element(By.ID, element_id)
     element.clear()
     element.send_keys(text_string)
 
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = Select(context.driver.find_element_by_id(element_id))
+    element = Select(context.driver.find_element(By.ID, element_id))
     element.select_by_visible_text(text)
 
 @then('I should see "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = Select(context.driver.find_element_by_id(element_id))
-    expect(element.first_selected_option.text).to_equal(text)
+    element = Select(context.driver.find_element(By.ID, element_id))
+    assert(element.first_selected_option.text == text)
 
 @then('the "{element_name}" field should be empty')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = context.driver.find_element_by_id(element_id)
-    expect(element.get_attribute('value')).to_be(u'')
+    element = context.driver.find_element(By.ID, element_id)
+    assert(element.get_attribute('value') == u'')
 
 ##################################################################
 # These two function simulate copy and paste
@@ -109,7 +107,7 @@ def step_impl(context, element_name):
 @when('I press the "{button}" button')
 def step_impl(context, button):
     button_id = button.lower() + '-btn'
-    context.driver.find_element_by_id(button_id).click()
+    context.driver.find_element(By.ID, button_id).click()
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
@@ -119,13 +117,12 @@ def step_impl(context, name):
             name
         )
     )
-    expect(found).to_be(True)
+    assert(found)
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
-    element = context.driver.find_element_by_id('search_results')
-    error_msg = "I should not see '%s' in '%s'" % (name, element.text)
-    ensure(name in element.text, False, error_msg)
+    element = context.driver.find_element(By.ID, 'search_results')
+    assert(name not in element.text)
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
@@ -135,13 +132,13 @@ def step_impl(context, message):
             message
         )
     )
-    expect(found).to_be(True)
+    assert(found)
 
 ##################################################################
 # This code works because of the following naming convention:
 # The id field for text input in the html is the element name
-# prefixed by ID_PREFIX so the Name field has an id='product_name'
-# We can then lowercase the name and prefix with product_ to get the id
+# prefixed by ID_PREFIX so the Name field has an id='pet_name'
+# We can then lowercase the name and prefix with pet_ to get the id
 ##################################################################
 
 @then('I should see "{text_string}" in the "{element_name}" field')
@@ -153,7 +150,7 @@ def step_impl(context, text_string, element_name):
             text_string
         )
     )
-    expect(found).to_be(True)
+    assert(found)
 
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
