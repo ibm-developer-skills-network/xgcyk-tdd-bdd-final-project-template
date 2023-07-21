@@ -24,8 +24,11 @@ For information on Waiting until elements are present in the HTML see:
 """
 import requests
 from behave import given
-from compare import expect
 
+# HTTP Return Codes
+HTTP_200_OK = 200
+HTTP_201_CREATED = 201
+HTTP_204_NO_CONTENT = 204
 
 @given('the following products')
 def step_impl(context):
@@ -35,10 +38,10 @@ def step_impl(context):
     #
     rest_endpoint = f"{context.base_url}/products"
     context.resp = requests.get(rest_endpoint)
-    expect(context.resp.status_code).to_equal(200)
+    assert(context.resp.status_code == HTTP_200_OK)
     for product in context.resp.json():
         context.resp = requests.delete(f"{rest_endpoint}/{product['id']}")
-        expect(context.resp.status_code).to_equal(204)
+        assert(context.resp.status_code == HTTP_204_NO_CONTENT)
 
     #
     # load the database with new products
