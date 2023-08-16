@@ -25,9 +25,10 @@ Test cases can be run with the following:
     nosetests --stop tests/test_service.py:TestProductService
 """
 import os
-import logging
 from decimal import Decimal
 from unittest import TestCase
+import logging
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
@@ -109,6 +110,16 @@ class TestProductRoutes(TestCase):
         self.assertEqual(data['message'], 'OK')
 
     # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+    
+
+    # ----------------------------------------------------------
     # TEST CREATE
     # ----------------------------------------------------------
     def test_create_product(self):
@@ -130,19 +141,15 @@ class TestProductRoutes(TestCase):
         self.assertEqual(new_product["available"], test_product.available)
         self.assertEqual(new_product["category"], test_product.category.name)
 
-        #
-        # Uncomment this code once READ is implemented
-        #
-
-        # # Check that the location header was correct
-        # response = self.client.get(location)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # new_product = response.get_json()
-        # self.assertEqual(new_product["name"], test_product.name)
-        # self.assertEqual(new_product["description"], test_product.description)
-        # self.assertEqual(Decimal(new_product["price"]), test_product.price)
-        # self.assertEqual(new_product["available"], test_product.available)
-        # self.assertEqual(new_product["category"], test_product.category.name)
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_product = response.get_json()
+        self.assertEqual(new_product["name"], test_product.name)
+        self.assertEqual(new_product["description"], test_product.description)
+        self.assertEqual(Decimal(new_product["price"]), test_product.price)
+        self.assertEqual(new_product["available"], test_product.available)
+        self.assertEqual(new_product["category"], test_product.category.name)
 
     def test_create_product_with_no_name(self):
         """It should not Create a Product without a name"""
@@ -163,6 +170,90 @@ class TestProductRoutes(TestCase):
         response = self.client.post(BASE_URL, data={}, content_type="plain/text")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    #
-    # ADD YOUR TEST CASES HERE
-    #
+    def test_call_create_with_an_id(self):
+        """It should not allow calling endpoint incorrectly"""
+        response = self.client.post(f"{BASE_URL}/0", json={})
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+    
+
+    def test_update_product_with_no_name(self):
+        """It should not Update a Product without assigning a name"""
+        product = self._create_products()[0]
+        product_data = product.serialize()
+        del product_data["name"]
+        response = self.client.put(f"{BASE_URL}/{product.id}", json=product_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_product_not_found(self):
+        """It should not Update a Product that doesn't exist"""
+        response = self.client.put(f"{BASE_URL}/foo", json={})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+    
+
+    def test_delete_non_existing_product(self):
+        """It should Delete a Product even if it doesn't exist"""
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
+    # ----------------------------------------------------------
+    # TEST QUERY
+    # ----------------------------------------------------------
+    
+
+        # test for unavailable
+        response = self.client.get(
+            BASE_URL, query_string="available=false"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), unavailable_count)
+        # check the data just to be sure
+        for product in data:
+            self.assertEqual(product["available"], False)
+
+    
+
+    # ----------------------------------------------------------
+    # TEST ACTION
+    # ----------------------------------------------------------
+    def test_purchase_a_product(self):
+        """It should Purchase a Product"""
+        products = self._create_products(10)
+        available_products = [product for product in products if product.available is True]
+        product = available_products[0]
+        response = self.client.put(f"{BASE_URL}/{product.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(f"{BASE_URL}/{product.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["available"], False)
+
+    def test_purchase_not_available(self):
+        """It should not Purchase a Product that is not available"""
+        products = self._create_products(10)
+        unavailable_products = [product for product in products if product.available is False]
+        product = unavailable_products[0]
+        response = self.client.put(f"{BASE_URL}/{product.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    ######################################################################
+    # Utility functions
+    ######################################################################
+
+    def get_product_count(self):
+        """save the current number of products"""
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        # logging.debug("data = %s", data)
+        return len(data)
