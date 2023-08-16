@@ -18,24 +18,23 @@
 """
 Product Store Service with UI
 """
-from flask import jsonify, request, abort
-from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from flask import jsonify, request, url_for, make_response, abort
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 
 
 ######################################################################
-# H E A L T H   C H E C K
+# GET HEALTH CHECK
 ######################################################################
 @app.route("/health")
 def healthcheck():
     """Let them know our heart is still beating"""
-    return jsonify(status=200, message="OK"), status.HTTP_200_OK
+    return make_response(jsonify(status=200, message="OK"), status.HTTP_200_OK)
 
 
 ######################################################################
-# H O M E   P A G E
+# GET INDEX
 ######################################################################
 @app.route("/")
 def index():
@@ -44,29 +43,31 @@ def index():
 
 
 ######################################################################
-#  U T I L I T Y   F U N C T I O N S
+# LIST ALL PRODUCTS
 ######################################################################
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        abort(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
-
-    if request.headers["Content-Type"] == content_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {content_type}",
-    )
 
 
 ######################################################################
-# C R E A T E   A   N E W   P R O D U C T
+# LIST BY NAME
+######################################################################
+
+
+######################################################################
+# LIST BY AVAILABILITY
+######################################################################
+
+######################################################################
+# LIST BY CATEGORY
+######################################################################
+
+######################################################################
+# RETRIEVE A PRODUCT
+######################################################################
+
+
+
+######################################################################
+# CREATE A NEW PRODUCT
 ######################################################################
 @app.route("/products", methods=["POST"])
 def create_products():
@@ -85,44 +86,46 @@ def create_products():
     app.logger.info("Product with new id [%s] saved!", product.id)
 
     message = product.serialize()
-
     #
     # Uncomment this line of code once you implement READ A PRODUCT
     #
     # location_url = url_for("get_products", product_id=product.id, _external=True)
     location_url = "/"  # delete once READ is implemented
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    return make_response(jsonify(message), status.HTTP_201_CREATED, {"Location": location_url})
 
 
 ######################################################################
-# L I S T   A L L   P R O D U C T S
-######################################################################
-
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
-
-######################################################################
-# R E A D   A   P R O D U C T
-######################################################################
-
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT
-#
-
-######################################################################
-# U P D A T E   A   P R O D U C T
-######################################################################
-
-#
-# PLACE YOUR CODE TO UPDATE A PRODUCT HERE
-#
-
-######################################################################
-# D E L E T E   A   P R O D U C T
+# UPDATE AN EXISTING PRODUCT
 ######################################################################
 
 
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
+
+######################################################################
+# DELETE A PRODUCT
+######################################################################
+
+
+
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {content_type}",
+    )
