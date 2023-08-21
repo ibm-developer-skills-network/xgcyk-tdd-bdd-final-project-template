@@ -28,7 +28,6 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
-from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
